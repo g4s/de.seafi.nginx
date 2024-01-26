@@ -1,0 +1,28 @@
+# simple role for installing nginx
+---
+
+- name: ensure www-user and group exists
+  block:
+    - ansible.builtin.group:
+        name: 'www'
+
+    - ansible.builtin.user:
+        name: 'www'
+        groups: 'www'
+  becomes: true
+  tags:
+    - user
+    - nginx
+    
+
+- ansible.builtin.tasks:
+    path: '{{ ansble_os_family }}/install.yml'
+  notify:
+    - start nginx-service
+  when: ansible_os_family != 'Windows'
+
+
+- ansible.builtin.task:
+    path: 'configure.yml'
+  notify:
+    - restart nginx-service
